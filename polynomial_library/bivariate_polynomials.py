@@ -3,6 +3,7 @@
 
 from typing import Union, List, Dict, Tuple
 from sympy import *
+import math
 
 
 class BivariatePolynomial:
@@ -18,7 +19,7 @@ class BivariatePolynomial:
         The degree of the polynomial.
     """
 
-    def __init__(self, coefficients: Union[List[float], Dict[Tuple[int, int], float]]) -> None:
+    def __init__(self, coefficients) -> None:
         """
         Initializes the BivariatePolynomial with either a list of coefficients
         or a dictionary of coefficients.
@@ -121,6 +122,16 @@ class BivariatePolynomial:
     def __repr__(self) -> str:
         return str(self)
 
+    def __eq__(self, other):
+        """
+        Checks if two polynomials are equal.
+        :param other: The other polynomial to compare
+        :return: True if the polynomials are equal, False otherwise
+        """
+        if not isinstance(other, BivariatePolynomial):
+            return False
+        return self.coefficients == other.coefficients
+
     def _derivative(self, variable):
         """
         Returns the derivative of the polynomial with respect to the specified variable.
@@ -221,8 +232,10 @@ class BivariatePolynomial:
         """
         Removes all items from the coefficients dictionary whose value is 0.
         """
+
         self.coefficients = {monomial: coefficient for monomial, coefficient in self.coefficients.items() if
                              coefficient != 0}
+        # print("Inside", self)
 
     def reduce(self) -> None:
         """
@@ -253,4 +266,3 @@ class BivariatePolynomial:
         :return: [dP/dx, dP/dy]
         """
         return [self.derivative(0), self.derivative(1)]
-
