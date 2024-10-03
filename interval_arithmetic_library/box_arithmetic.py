@@ -9,9 +9,6 @@ class Box:
         self.sides = self.find_sides()
         self.vertex = []
         self.mark = False
-        self.C0_predicate = False
-        self.C1_predicate = False
-        self.C1Prime = False
         self.parent = None
         self.balanced = False  # Mark True if box was subdivided for balancing.
         self.children = []
@@ -187,3 +184,41 @@ class Box:
             (self.x_interval.upper_bound, self.y_interval.upper_bound),
             (self.x_interval.lower_bound, self.y_interval.upper_bound)
         ]
+
+    def subdivide(self):
+        """
+        Subdivide the current box into four smaller boxes.
+
+        This method splits the current box into four sub-boxes by dividing both the
+        x and y intervals in half. The resulting boxes inherit the class type of the
+        current box (i.e., if called from a `PVBox`, it returns `PVBox` instances).
+
+        Each new box is assigned the current box as its parent, and the current box
+        will have a `children` attribute that stores the four sub-boxes.
+
+        Returns:
+            list[Box]: A list of four sub-boxes, each of the same type as the calling class
+                       (either `Box` or `PVBox`).
+        """
+        x1 = Interval(self.x_interval.lower_bound, (self.x_interval.lower_bound + self.x_interval.upper_bound) / 2)
+        x2 = Interval((self.x_interval.lower_bound + self.x_interval.upper_bound) / 2, self.x_interval.upper_bound)
+
+        y1 = Interval(self.y_interval.lower_bound, (self.y_interval.lower_bound + self.y_interval.upper_bound) / 2)
+        y2 = Interval((self.y_interval.lower_bound + self.y_interval.upper_bound) / 2, self.y_interval.upper_bound)
+
+        # Use type(self) to dynamically determine if it's Box or PVBox
+        box1 = type(self)(x2, y2)
+        box2 = type(self)(x1, y2)
+        box3 = type(self)(x1, y1)
+        box4 = type(self)(x2, y1)
+
+        # Set parent relationships
+        box1.parent = self
+        box2.parent = self
+        box3.parent = self
+        box4.parent = self
+
+        # Set children for the current box
+        self.children = [box1, box2, box3, box4]
+
+        return [box1, box2, box3, box4]

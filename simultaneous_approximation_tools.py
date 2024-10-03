@@ -2,10 +2,13 @@ from polynomial_library.bivariate_polynomials import *
 from interval_arithmetic_library.box_arithmetic import Box
 from interval_arithmetic_library.interval_arithmetic import Interval
 
+
 class PVBox(Box):
     def __init__(self, x_int, y_int):
         super().__init__(x_int, y_int)
-
+        self.C0_predicate = False
+        self.C1_predicate = False
+        self.C1Prime = False
 
 
 def evaluate_bivariate_over_box(function, box):
@@ -124,26 +127,32 @@ def detect_sign_change(function, point1, point2):
 
 
 def find_neighbors(current_box, box_list):
+    """
+    Find all neighboring boxes of a given box in a list.
+
+    A neighboring box is determined by the `is_neighbor` method of the box object.
+
+    Parameters:
+        current_box (Box): The box for which neighbors are being searched.
+        box_list (list[Box]): A list of boxes to check for neighbors.
+
+    Returns:
+        list[Box]: A list of boxes that are neighbors of the `current_box`.
+    """
     neighbor_list = []
     for other_box in box_list:
         if current_box.is_neighbor(other_box):
             neighbor_list.append(other_box)
     return neighbor_list
 
-exit()
 
-# Test find_neighbors
+def is_same_side(box, pt1, pt2):
+    """
+    Determine if two points are on the same side of a box.
 
-# Define the intervals for the boxes
-x1 = Interval(0, 1)
-x2 = Interval(1, 2)
-y1 = Interval(0, 1)
-
-print(x1)
-
-
-
-box1 = Box(x1, y1)
-box2 = Box(x2, y1)
-
-print(find_neighbors(box1, [box1, box2]))
+    :param box: The box object containing the points.
+    :param pt1: The first point to determine which side.
+    :param pt2: The second point to determine which side.
+    :return: True if the points are on the same side of the box, False otherwise.
+    """
+    return box.which_side(pt1) == box.which_side(pt2)
